@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: veera_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin1023
+      POSTGRES_DB: payroll_db
+    ports:
+      - "5442:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./Backend
+    container_name: veera_backend
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "3012:3012"
+    environment:
+      DATABASE_URL: postgres://postgres:admin1023@postgres:5432/payroll_db
+    volumes:
+      - ./Backend:/app
+
+  frontend:
+    build: ./Frontend
+    container_name: veera_frontend
+    restart: always
+    ports:
+      - "8022:80"
+    depends_on:
+      - backend
+
+  hr:
+    build: ./HR
+    container_name: veera_hr
+    restart: always
+    ports:
+      - "8023:80"
+    depends_on:
+      - backend
+
+  payslip:
+    build: ./Payslip
+    container_name: veera_payslip
+    restart: always
+    ports:
+      - "8024:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+
