@@ -13,7 +13,7 @@ const pool = new Pool({
     user: 'postgres',
     host: 'postgres',
     database: 'payroll_db',
-    password: 'admin1023',
+    password: 'admin234',
     port: 5432,
 });
 
@@ -284,5 +284,5 @@ app.get('/api/tax-records/:month', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running at http://3.110.28.1:${port}`);
+    console.log(`Server running at http://43.204.144.109:${port}`);
 });
