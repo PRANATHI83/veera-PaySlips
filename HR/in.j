@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --card-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .step-card {
+            flex: 1;
+            background: var(--card-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .section-content {
+            background: var(--card-color);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .action-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--primary-color);
+            color: white;
+            margin: 5px;
+        }
+
+        .payslip-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .report-history {
+            margin-top: 20px;
+        }
+
+        .report-history h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        #submissionHistory {
+            list-style: none;
+        }
+
+        #submissionHistory li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced Data Display Styles */
+        .payslips-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .payslip-card {
+            background: var(--card-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .payslip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .payslip-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--secondary-color), #8e44ad);
+        }
+
+        .payslip-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .initials-circle {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--secondary-color), #9b59b6);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .employee-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .employee-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .employee-id {
+            font-size: 13px;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+        }
+
+        .employee-id i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+
+        .payslip-body {
+            padding: 20px;
+        }
+
+        .payslip-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .net-pay {
+            grid-column: span 2;
+            background: rgba(39, 174, 96, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .net-pay .summary-label {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .net-pay .summary-value {
+            font-size: 18px;
+            color: var(--success-color);
+        }
+
+        .payslip-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px 20px;
+        }
+
+        .view-details-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .view-details-btn i {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .view-details-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Details Section */
+        .payslip-details-section {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+
+        .payslip-details-section.active {
+            max-height: 1500px;
+            padding: 0 20px 20px;
+        }
+
+        .details-section {
+            margin-top: 20px;
+        }
+
+        .details-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .details-title i {
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-item {
+            margin-bottom: 10px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-color);
+            word-break: break-word;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.08);
+            margin: 20px 0;
+        }
+
+        /* Enhanced Report Tables */
+        .report-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .report-table th {
+            background: linear-gradient(135deg, var(--secondary-color), #3498db);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .report-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 13px;
+        }
+
+        .report-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .report-table tr:nth-child(even) {
+            background-color: rgba(236, 240, 241, 0.5);
+        }
+
+        .report-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        /* Summary Cards */
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .summary-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-card h3 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .payslips-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .payslip-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .net-pay {
+                grid-column: span 1;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Animation Enhancements */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .payslip-card {
+            animation: fadeInUp 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
+        .payslip-card:nth-child(1) { animation-delay: 0.1s; }
+        .payslip-card:nth-child(2) { animation-delay: 0.2s; }
+        .payslip-card:nth-child(3) { animation-delay: 0.3s; }
+        .payslip-card:nth-child(4) { animation-delay: 0.4s; }
+        .payslip-card:nth-child(5) { animation-delay: 0.5s; }
+
+        /* Tab styles */
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background-color: #fff;
+            border-color: #ddd;
+            border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .no-data {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .no-data i {
+            font-size: 40px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Payroll Management</h1>
+        <p>HR Management System</p>
+    </header>
+
+    <div class="container">
+        <div class="steps-container">
+            <div class="step-card" onclick="showSection('payslip')">
+                <div class="step-number">1</div>
+                <h3>Payslip Management</h3>
+                <p>View and manage employee payslips</p>
+            </div>
+            <div class="step-card" onclick="showSection('reports')">
+                <div class="step-number">2</div>
+                <h3>Reports</h3>
+                <p>Generate payroll reports</p>
+            </div>
+        </div>
+
+        <!-- Payslip Section -->
+        <div class="section-content" id="payslip-section">
+            <h2>Payslip Management</h2>
+            <div class="action-card">
+                <div class="form-group">
+                    <label for="payslipDepartmentFilter">Filter by Department</label>
+                    <select id="payslipDepartmentFilter">
+                        <option value="">All Departments</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Engineering">Engineering</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payslipMonthFilter">Filter by Month</label>
+                    <input type="month" id="payslipMonthFilter" min="2005-01" max="2025-05">
+                </div>
+                <div id="payslips-container" class="payslips-container">
+                    <!-- Payslips will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="section-content hidden" id="reports-section">
+            <h2>Payroll Reports</h2>
+            <div class="action-card">
+                <div class="tab-container">
+                    <div class="tab active" onclick="showTab('pf-report')">PF Report</div>
+                    <div class="tab" onclick="showTab('esic-report')">ESIC Report</div>
+                    <div class="tab" onclick="showTab('tax-report')">Tax Report</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportMonth">Select Month</label>
+                    <input type="month" id="reportMonth" required min="2005-01" max="2025-05">
+                </div>
+                <div class="form-group">
+                    <label for="reportDepartmentFilter">Filter by Department</label>
+                    <select id="reportDepartmentFilter">
+                        <option value="">All Departments</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Engineering">Engineering</option>
+                    </select>
+                </div>
+
+                <div id="pf-report" class="tab-content active">
+                    <div id="pf-report-container" class="report-container">
+                        <!-- PF data will be displayed here -->
+                    </div>
+                </div>
+
+                <div id="esic-report" class="tab-content">
+                    <div id="esic-report-container" class="report-container">
+                        <!-- ESIC data will be displayed here -->
+                    </div>
+                </div>
+
+                <div id="tax-report" class="tab-content">
+                    <div id="tax-report-container" class="report-container">
+                        <!-- Tax data will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentActiveTab = 'pf-report';
+        let currentReportType = 'pf';
+
+        // Initialize the page
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize UI components
+            initTabs();
+            initFilters();
+            
+            // Load initial data
+            loadPayslips();
+        });
+
+        // Tab functionality
+        function initTabs() {
+            const tabs = document.querySelectorAll(".tab");
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove("active"));
+                    // Add active class to clicked tab
+                    this.classList.add("active");
+                    
+                    // Get the tab content to show
+                    const tabId = this.getAttribute("onclick").match(/'([^']+)'/)[1];
+                    showTab(tabId);
+                });
+            });
+        }
+
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll(".tab-content").forEach(content => {
+                content.classList.remove("active");
+            });
+            
+            // Show selected tab content
+            const tabContent = document.getElementById(tabId);
+            if (tabContent) {
+                tabContent.classList.add("active");
+                currentActiveTab = tabId;
+                
+                // Set current report type based on tab
+                if (tabId === 'pf-report') currentReportType = 'pf';
+                else if (tabId === 'esic-report') currentReportType = 'esic';
+                else if (tabId === 'tax-report') currentReportType = 'tax';
+                
+                // Load data for the selected tab
+                const reportMonth = document.getElementById('reportMonth');
+                const reportDepartmentFilter = document.getElementById('reportDepartmentFilter');
+                const month = reportMonth ? reportMonth.value : '';
+                const department = reportDepartmentFilter ? reportDepartmentFilter.value : '';
+                
+                if (month) {
+                    if (currentReportType === 'pf') loadPFRecords(month, department);
+                    else if (currentReportType === 'esic') loadESICRecords(month, department);
+                    else if (currentReportType === 'tax') loadTaxRecords(month, department);
+                }
+            } else {
+                console.error(`Tab content with ID ${tabId} not found`);
+            }
+        }
+
+        // Filter functionality
+        function initFilters() {
+            // Payslip filters
+            const payslipDepartmentFilter = document.getElementById('payslipDepartmentFilter');
+            const payslipMonthFilter = document.getElementById('payslipMonthFilter');
+            const reportMonth = document.getElementById('reportMonth');
+            const reportDepartmentFilter = document.getElementById('reportDepartmentFilter');
+
+            if (payslipDepartmentFilter) {
+                payslipDepartmentFilter.addEventListener('change', function() {
+                    const month = payslipMonthFilter ? payslipMonthFilter.value : '';
+                    loadPayslips(this.value, month);
+                });
+            } else {
+                console.error('Element with ID payslipDepartmentFilter not found');
+            }
+
+            if (payslipMonthFilter) {
+                payslipMonthFilter.addEventListener('input', function() {
+                    const department = payslipDepartmentFilter ? payslipDepartmentFilter.value : '';
+                    loadPayslips(department, this.value);
+                });
+            } else {
+                console.error('Element with ID payslipMonthFilter not found');
+            }
+
+            if (reportMonth) {
+                reportMonth.addEventListener('input', function() {
+                    const department = reportDepartmentFilter ? reportDepartmentFilter.value : '';
+                    if (currentReportType === 'pf') loadPFRecords(this.value, department);
+                    else if (currentReportType === 'esic') loadESICRecords(this.value, department);
+                    else if (currentReportType === 'tax') loadTaxRecords(this.value, department);
+                });
+            } else {
+                console.error('Element with ID reportMonth not found');
+            }
+
+            if (reportDepartmentFilter) {
+                reportDepartmentFilter.addEventListener('change', function() {
+                    const month = reportMonth ? reportMonth.value : '';
+                    if (month) {
+                        if (currentReportType === 'pf') loadPFRecords(month, this.value);
+                        else if (currentReportType === 'esic') loadESICRecords(month, this.value);
+                        else if (currentReportType === 'tax') loadTaxRecords(month, this.value);
+                    }
+                });
+            } else {
+                console.error('Element with ID reportDepartmentFilter not found');
+            }
+        }
+
+        // Section navigation
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll(".section-content");
+            sections.forEach(section => {
+                if (section.id === `${sectionId}-section`) {
+                    section.classList.remove("hidden");
+                } else {
+                    section.classList.add("hidden");
+                }
+            });
+        }
+
+        // Toggle payslip details
+        function toggleDetails(payslipId) {
+            const detailsSection = document.getElementById(`payslip-${payslipId}`);
+            if (detailsSection) {
+                if (detailsSection.classList.contains('active')) {
+                    detailsSection.classList.remove('active');
+                } else {
+                    // Hide all other details sections
+                    document.querySelectorAll('.payslip-details-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    detailsSection.classList.add('active');
+                }
+            } else {
+                console.error(`Details section with ID payslip-${payslipId} not found`);
+            }
+        }
+
+        // Data loading functions
+        async function loadPayslips(department = '', month = '') {
+            const payslipsContainer = document.getElementById('payslips-container');
+            if (!payslipsContainer) {
+                console.error('Element with ID payslips-container not found');
+                return;
+            }
+
+            try {
+                let url = 'http://43.204.144.109:3012/api/payslips?';
+                if (department) url += `department=${encodeURIComponent(department)}&`;
+                if (month) url += `month=${encodeURIComponent(month)}`;
+                
+                // Remove trailing ? or &
+                url = url.replace(/[?&]$/, '');
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch payslips: ${response.statusText}`);
+                }
+                
+                const payslips = await response.json();
+
+                // Log for debugging
+                console.log('Fetched payslips:', payslips);
+
+                payslipsContainer.innerHTML = '';
+                if (!Array.isArray(payslips) || payslips.length === 0) {
+                    payslipsContainer.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No Payslips Found</h3>
+                            <p>Submit a payslip form to see records here</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort by date (newest first)
+                payslips.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                payslips.forEach(payslip => {
+                    // Validate employee_name to prevent TypeError
+                    if (!payslip.employee_name || typeof payslip.employee_name !== 'string') {
+                        console.warn('Skipping payslip with invalid employee_name:', payslip);
+                        return;
+                    }
+
+                    const payslipCard = document.createElement('div');
+                    payslipCard.className = 'payslip-card';
+
+                    // Get initials for avatar
+                    const initials = payslip.employee_name.split(' ')
+                        .map(name => name[0])
+                        .join('')
+                        .toUpperCase();
+
+                    // Format dates
+                    const generatedDate = new Date(payslip.timestamp);
+                    const monthYear = generatedDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+                    const joinDate = new Date(payslip.date_of_joining);
+                    const formattedJoinDate = joinDate.toLocaleDateString();
+
+                    // Ensure nested objects exist
+                    const bankDetails = payslip.bank_details || {};
+                    const governmentIds = payslip.government_ids || {};
+                    const earnings = payslip.earnings || {};
+                    const deductions = payslip.deductions || {};
+                    const totals = payslip.totals || {};
+
+                    // Create payslip card HTML
+                    payslipCard.innerHTML = `
+                        <div class="payslip-header">
+                            <div class="initials-circle">${initials}</div>
+                            <div class="employee-info">
+                                <div class="employee-name">${payslip.employee_name}</div>
+                                <div class="employee-id">
+                                    <i class="fas fa-id-card"></i> ${payslip.employee_id || 'N/A'} 
+                                    <span style="margin: 0 5px">•</span>
+                                    <i class="fas fa-building"></i> ${payslip.department || 'N/A'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="payslip-body">
+                            <div class="payslip-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">Pay Period</span>
+                                    <span class="summary-value">${monthYear}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Employment Type</span>
+                                    <span class="summary-value">${payslip.employment_type || 'N/A'}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Working Days</span>
+                                    <span class="summary-value">${payslip.working_days || 'N/A'}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Joined On</span>
+                                    <span class="summary-value">${formattedJoinDate}</span>
+                                </div>
+                                <div class="net-pay">
+                                    <span class="summary-label">NET PAY</span>
+                                    <span class="summary-value">₹${(totals.netPay || 0).toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="payslip-actions">
+                            <button class="view-details-btn" onclick="toggleDetails('${payslip._id || payslip.employee_id}')">
+                                <i class="fas fa-chevron-down"></i> View Details
+                            </button>
+                        </div>
+                        
+                        <div id="payslip-${payslip._id || payslip.employee_id}" class="payslip-details-section">
+                            <div class="details-section">
+                                <h3 class="details-title"><i class="fas fa-university"></i> Bank Details</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Bank Name</div>
+                                        <div class="detail-value">${bankDetails.bankName || 'N/A'}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Account Number</div>
+                                        <div class="detail-value">${bankDetails.accountNumber || 'N/A'}</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <div class="details-section">
+                                <h3 class="details-title"><i class="fas fa-id-badge"></i> Government IDs</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">UAN Number</div>
+                                        <div class="detail-value">${governmentIds.uanNumber || 'N/A'}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">PAN Number</div>
+                                        <div class="detail-value">${governmentIds.panNumber || 'N/A'}</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <div class="details-section">
+                                <h3 class="details-title"><i class="fas fa-money-bill-wave"></i> Earnings</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Basic Salary</div>
+                                        <div class="detail-value">₹${(earnings.basicSalary || 0).toFixed(2)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">HRA</div>
+                                        <div class="detail-value">₹${(earnings.hra || 0).toFixed(2)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Special Allowance</div>
+                                        <div class="detail-value">₹${(earnings.specialAllowance || 0).toFixed(2)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Bonus</div>
+                                        <div class="detail-value">₹${(earnings.bonus || 0).toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <div class="details-section">
+                                <h3 class="details-title"><i class="fas fa-file-invoice-dollar"></i> Deductions</h3>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Income Tax</div>
+                                        <div class="detail-value">₹${(deductions.incomeTaxDeduction || 0).toFixed(2)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Provident Fund</div>
+                                        <div class="detail-value">₹${(deductions.pf || 0).toFixed(2)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Health Insurance</div>
+                                        <div class="detail-value">₹${(deductions.healthInsurance || 0).toFixed(2)}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Total Deductions</div>
+                                        <div class="detail-value">₹${(totals.totalDeductions || 0).toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    payslipsContainer.appendChild(payslipCard);
+                });
+            } catch (err) {
+                console.error('Error fetching payslips:', err);
+                payslipsContainer.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Payslips</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadPFRecords(month, department = '') {
+            const pfReportContainer = document.getElementById('pf-report-container');
+            if (!pfReportContainer) {
+                console.error('Element with ID pf-report-container not found');
+                return;
+            }
+
+            if (!month) {
+                pfReportContainer.innerHTML = '<p class="no-data">Please select a month to view PF records</p>';
+                return;
+            }
+
+            try {
+                const url = department ? 
+                    `http://43.204.144.109:3012/api/pf-records/${month}?department=${encodeURIComponent(department)}` : 
+                    `http://43.204.144.109:3012/api/pf-records/${month}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch PF records: ${response.statusText}`);
+                }
+                const pfRecords = await response.json();
+
+                console.log('Fetched PF records:', pfRecords);
+
+                const monthName = new Date(month + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
+
+                if (Array.isArray(pfRecords) && pfRecords.length > 0) {
+                    let tableContent = `
+                        <h3>PF Records for ${monthName}</h3>
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Employee ID</th>
+                                    <th>PF Number</th>
+                                    <th>PF Amount (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    pfRecords.forEach(record => {
+                        if (!record.employee_name || typeof record.employee_name !== 'string') {
+                            console.warn('Skipping PF record with invalid employee_name:', record);
+                            return;
+                        }
+                        tableContent += `
+                            <tr>
+                                <td>${record.employee_name}</td>
+                                <td>${record.employee_id || 'N/A'}</td>
+                                <td>${record.pf_number || 'N/A'}</td>
+                                <td>${(parseFloat(record.pf_amount) || 0).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableContent += `
+                            </tbody>
+                        </table>
+                        <div class="summary-row" style="margin-top: 15px;">
+                            <span class="summary-label">Total PF Contributions:</span>
+                            <span class="summary-value">₹${pfRecords.reduce((sum, record) => sum + (parseFloat(record.pf_amount) || 0), 0).toFixed(2)}</span>
+                        </div>
+                    `;
+
+                    pfReportContainer.innerHTML = tableContent;
+                } else {
+                    pfReportContainer.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No PF Records Available</h3>
+                            <p>No PF records found for ${monthName}</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Error fetching PF records:', err);
+                pfReportContainer.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading PF Records</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadESICRecords(month, department = '') {
+            const esicReportContainer = document.getElementById('esic-report-container');
+            if (!esicReportContainer) {
+                console.error('Element with ID esic-report-container not found');
+                return;
+            }
+
+            if (!month) {
+                esicReportContainer.innerHTML = '<p class="no-data">Please select a month to view ESIC records</p>';
+                return;
+            }
+
+            try {
+                const url = department ? 
+                    `http://43.204.144.109:3012/api/esic-records/${month}?department=${encodeURIComponent(department)}` : 
+                    `http://43.204.144.109:3012/api/esic-records/${month}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ESIC records: ${response.statusText}`);
+                }
+                const esicRecords = await response.json();
+
+                console.log('Fetched ESIC records:', esicRecords);
+
+                const monthName = new Date(month + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
+
+                if (Array.isArray(esicRecords) && esicRecords.length > 0) {
+                    let tableContent = `
+                        <h3>ESIC Records for ${monthName}</h3>
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Employee ID</th>
+                                    <th>ESIC Number</th>
+                                    <th>ESIC Amount (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    esicRecords.forEach(record => {
+                        if (!record.employee_name || typeof record.employee_name !== 'string') {
+                            console.warn('Skipping ESIC record with invalid employee_name:', record);
+                            return;
+                        }
+                        tableContent += `
+                            <tr>
+                                <td>${record.employee_name}</td>
+                                <td>${record.employee_id || 'N/A'}</td>
+                                <td>${record.esic_number || 'N/A'}</td>
+                                <td>${(parseFloat(record.esic_amount) || 0).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableContent += `
+                            </tbody>
+                        </table>
+                        <div class="summary-row" style="margin-top: 15px;">
+                            <span class="summary-label">Total ESIC Contributions:</span>
+                            <span class="summary-value">₹${esicRecords.reduce((sum, record) => sum + (parseFloat(record.esic_amount) || 0), 0).toFixed(2)}</span>
+                        </div>
+                    `;
+
+                    esicReportContainer.innerHTML = tableContent;
+                } else {
+                    esicReportContainer.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No ESIC Records Available</h3>
+                            <p>No ESIC records found for ${monthName}</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Error fetching ESIC records:', err);
+                esicReportContainer.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading ESIC Records</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadTaxRecords(month, department = '') {
+            const taxReportContainer = document.getElementById('tax-report-container');
+            if (!taxReportContainer) {
+                console.error('Element with ID tax-report-container not found');
+                return;
+            }
+
+            if (!month) {
+                taxReportContainer.innerHTML = '<p class="no-data">Please select a month to view tax records</p>';
+                return;
+            }
+
+            try {
+                const url = department ? 
+                    `http://43.204.144.109:3012/api/tax-records/${month}?department=${encodeURIComponent(department)}` : 
+                    `http://43.204.144.109:3012/api/tax-records/${month}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch tax records: ${response.statusText}`);
+                }
+                const taxRecords = await response.json();
+
+                console.log('Fetched tax records:', taxRecords);
+
+                const monthName = new Date(month + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
+
+                if (Array.isArray(taxRecords) && taxRecords.length > 0) {
+                    let tableContent = `
+                        <h3>Tax Records for ${monthName}</h3>
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Employee ID</th>
+                                    <th>PAN Number</th>
+                                    <th>Gross Income (₹)</th>
+                                    <th>Tax Deduction (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    taxRecords.forEach(record => {
+                        if (!record.employee_name || typeof record.employee_name !== 'string') {
+                            console.warn('Skipping tax record with invalid employee_name:', record);
+                            return;
+                        }
+                        tableContent += `
+                            <tr>
+                                <td>${record.employee_name}</td>
+                                <td>${record.employee_id || 'N/A'}</td>
+                                <td>${record.pan_number || 'N/A'}</td>
+                                <td>${(parseFloat(record.gross_income) || 0).toFixed(2)}</td>
+                                <td>${(parseFloat(record.tax_deduction) || 0).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableContent += `
+                            </tbody>
+                        </table>
+                        <div class="summary-row" style="margin-top: 15px;">
+                            <span class="summary-label">Total Tax Deductions:</span>
+                            <span class="summary-value">₹${taxRecords.reduce((sum, record) => sum + (parseFloat(record.tax_deduction) || 0), 0).toFixed(2)}</span>
+                        </div>
+                    `;
+
+                    taxReportContainer.innerHTML = tableContent;
+                } else {
+                    taxReportContainer.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No Tax Records Available</h3>
+                            <p>No tax records found for ${monthName}</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Error fetching tax records:', err);
+                taxReportContainer.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Tax Records</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Payslip</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #1abc9c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --light-gray: #bdc3c7;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 6px 12px rgba(0,0,0,0.15);
+            --radius: 8px;
+            --radius-sm: 4px;
+            --transition: all 0.3s ease
+        }
+        * {
+            box-sizing: border-box;
+            font-family: Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+            margin: 0;
+            padding: 0
+        }
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6
+        }
+        .header {
+            background: linear-gradient(135deg,#2c3e50,#2980b9);
+            box-shadow: var(--shadow);
+            color: var(--white);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            text-align: center
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: .5rem
+        }
+        .header p {
+            font-size: 1rem;
+            opacity: .9
+        }
+        #payslip-form {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin: 0 auto 3rem;
+            max-width: 1000px;
+            padding: 2rem
+        }
+        section {
+            animation: fadeIn .5s ease-out forwards;
+            background: var(--light);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            padding: 1.5rem
+        }
+        h2 {
+            align-items: center;
+            border-bottom: 2px solid var(--light-gray);
+            color: var(--secondary);
+            display: flex;
+            font-size: 1.5rem;
+            gap: .75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: .75rem
+        }
+        h2 i {
+            color: var(--primary)
+        }
+        .employee-details .details {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit,minmax(250px,1fr))
+        }
+        .form-group {
+            margin-bottom: 1.25rem
+        }
+        label {
+            color: var(--secondary);
+            display: block;
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: .5rem
+        }
+        .input-container {
+            position: relative
+        }
+        input[type=number],input[type=text], select {
+            background-color: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            padding: .75rem 1rem;
+            transition: var(--transition);
+            width: 100%
+        }
+        input[type=number]:focus,input[type=text]:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52,152,219,.2);
+            outline: none
+        }
+        input[type="month"], input[type="date"] {
+            appearance: none;
+            background-color: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius-sm);
+            padding: .75rem 1rem;
+            font-size: 1rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232c3e50' viewBox='0 0 16 16'%3E%3Cpath d='M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z'/%3E%3Cpath d='M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+        .error-message {
+            color: var(--danger);
+            display: block;
+            font-size: .85rem;
+            line-height: 1.4;
+            margin-top: .5rem;
+            min-height: 1.25rem;
+            padding-left: .25rem
+        }
+        .validation-icon {
+            font-size: .9rem;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            right: .75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: var(--transition)
+        }
+        .valid {
+            border-color: var(--success)!important;
+            padding-right: 2rem
+        }
+        .valid+.validation-icon {
+            color: var(--success);
+            opacity: 1
+        }
+        .invalid {
+            border-color: var(--danger)!important;
+            padding-right: 2rem
+        }
+        .invalid+.validation-icon {
+            color: var(--danger);
+            opacity: 1
+        }
+        table {
+            border-collapse: collapse;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: 1rem;
+            overflow: hidden;
+            width: 100%
+        }
+        td,th {
+            border-bottom: 1px solid var(--light-gray);
+            padding: 1rem;
+            text-align: left
+        }
+        th {
+            background-color: var(--secondary);
+            color: var(--white);
+            font-weight: 500
+        }
+        tr:nth-child(even) {
+            background-color: rgba(236,240,241,.5)
+        }
+        tr:hover {
+            background-color: rgba(52,152,219,.1)
+        }
+        td input[type=number] {
+            padding: .5rem .75rem;
+            text-align: right;
+            width: 150px
+        }
+        .net-pay-container {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(3,1fr);
+            padding: 1.5rem
+        }
+        .net-pay-item {
+            padding: 1rem;
+            text-align: center;
+            border-radius: var(--radius-sm)
+        }
+        .net-pay-item strong {
+            color: var(--secondary);
+            display: block;
+            font-size: 1rem;
+            margin-bottom: .5rem
+        }
+        .net-pay-item span {
+            font-size: 1.25rem;
+            font-weight: 600
+        }
+        #total-earnings {
+            color: var(--success)
+        }
+        #total-deductions {
+            color: var(--danger)
+        }
+        #net-pay {
+            color: var(--primary)
+        }
+        .button-container {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem
+        }
+        button {
+            align-items: center;
+            background-color: var(--primary);
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            color: var(--white);
+            cursor: pointer;
+            display: inline-flex;
+            font-size: 1rem;
+            gap: .5rem;
+            padding: .75rem 1.75rem;
+            transition: var(--transition)
+        }
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px)
+        }
+        .btn-submit {
+            background-color: var(--success)
+        }
+        .btn-submit:hover {
+            background-color: #219653
+        }
+        .btn-generate {
+            background-color: var(--warning)
+        }
+        .btn-generate:hover {
+            background-color: #e67e22
+        }
+        @media (max-width: 768px) {
+            #payslip-form {
+                padding: 1.25rem
+            }
+            section {
+                padding: 1.25rem
+            }
+            .net-pay-container {
+                grid-template-columns: 1fr
+            }
+            .button-container {
+                flex-direction: column;
+                gap: 1rem
+            }
+            button {
+                justify-content: center;
+                width: 100%
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+        .toast {
+            align-items: center;
+            animation: fadeIn .3s ease-out;
+            bottom: 20px;
+            box-shadow: var(--shadow-md);
+            color: var(--white);
+            display: flex;
+            gap: .75rem;
+            padding: 1rem 1.5rem;
+            position: fixed;
+            right: 20px;
+            z-index: 1000;
+            border-radius: var(--radius)
+        }
+        .toast-success {
+            background-color: var(--success)
+        }
+        .toast-error {
+            background-color: var(--danger)
+        }
+        .toast-warning {
+            background-color: var(--warning)
+        }
+        .spinner {
+            animation: spin 1s ease-in-out infinite;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            display: inline-block;
+            height: 1rem;
+            width: 1rem
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+        .success-message {
+            background-color: var(--success);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <form id="payslip-form" onsubmit="validateForm(event)">
+        <section class="employee-details">
+            <h2><i class="fas fa-user-tie"></i> Employee Details</h2>
+            <div class="details">
+                <div class="form-group">
+                    <label for="employee-name">Employee Name</label>
+                    <div class="input-container">
+                        <input id="employee-name" maxlength="30" name="employee-name" placeholder="Name" required type="text"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="name-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="employee-id">Employee ID</label>
+                    <div class="input-container">
+                        <input id="employee-id" maxlength="7" name="employee-id" placeholder="ATS0123" required type="text"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="id-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <div class="input-container">
+                        <select id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="IT">IT</option>
+                            <option value="HR">HR</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Engineering">Engineering</option>
+                        </select>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="department-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="employment-type">Employment Type</label>
+                    <div class="input-container">
+                        <select id="employment-type" name="employment-type" required>
+                            <option value="">Select Employment Type</option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Temporary">Temporary</option>
+                            <option value="Intern">Intern</option>
+                        </select>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="employment-type-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="working-days">Working Days</label>
+                    <div class="input-container">
+                        <input id="working-days" name="working-days" type="number" min="1" max="31" placeholder="Working Days" required/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="working-days-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="date-of-joining">Date of Joining</label>
+                    <div class="input-container">
+                        <input id="date-of-joining" name="date-of-joining" type="date" required/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="date-of-joining-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="payroll-month">Payroll Month</label>
+                    <div class="input-container">
+                        <input id="payroll-month" name="payroll-month" type="month" required min="2005-01" max="2025-05">
+                        <i class="fas fa-calendar-alt validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="payroll-month-error"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="bank-details">
+            <h2><i class="fas fa-university"></i> Bank Details</h2>
+            <div class="details">
+                <div class="form-group">
+                    <label for="bank-name">Bank Name</label>
+                    <div class="input-container">
+                        <input id="bank-name" name="bank-name" placeholder="Bank Name" required type="text"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="bank-name-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="account-number">Bank Account No</label>
+                    <div class="input-container">
+                        <input id="account-number" name="account-number" placeholder="Bank Account Number" required type="text"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="account-number-error"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="government-details">
+            <h2><i class="fas fa-id-card"></i> Government IDs</h2>
+            <div class="details">
+                <div class="form-group">
+                    <label for="uan-number">UAN No</label>
+                    <div class="input-container">
+                        <input id="uan-number" name="uan-number" placeholder="939999999999" required type="text" pattern="[0-9]{12}" title="12-digit UAN number"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="uan-number-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="pan-number">PAN No</label>
+                    <div class="input-container">
+                        <input id="pan-number" name="pan-number" placeholder="JASWP9876H" required type="text" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="10-character PAN (e.g., ABCDE1234F)"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="pan-number-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="pf-number">Provident Fund No</label>
+                    <div class="input-container">
+                        <input id="pf-number" name="pf-number" placeholder="WWEER87655667673" required type="text"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="pf-number-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="esic-number">ESIC No</label>
+                    <div class="input-container">
+                        <input id="esic-number" name="esic-number" placeholder="ESIC090292" required type="text"/>
+                        <i class="fas fa-check validation-icon"></i>
+                    </div>
+                    <span class="error-message" id="esic-number-error"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="pay-details">
+            <h2><i class="fas fa-money-bill-wave"></i> Earnings and Deductions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="fas fa-rupee-sign"></i> Basic Salary</td>
+                        <td>
+                            <input min="0" name="basic-salary" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="basic-salary-error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-home"></i> HRA (House Rent Allowance)</td>
+                        <td>
+                            <input min="0" name="hra" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="hra-error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-star"></i> Special Allowance</td>
+                        <td>
+                            <input min="0" name="special-allowance" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="special-allowance-error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-gift"></i> Bonus</td>
+                        <td>
+                            <input min="0" name="bonus" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="bonus-error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-file-invoice-dollar"></i> Income Tax Deduction</td>
+                        <td>
+                            <input min="0" name="income-tax-deduction" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="income-tax-error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-piggy-bank"></i> Provident Fund (PF)</td>
+                        <td>
+                            <input min="0" name="pf" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="pf-error"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fas fa-heartbeat"></i> Health Insurance</td>
+                        <td>
+                            <input min="0" name="health-insurance" oninput="validateNumberInput(this)" placeholder="0.00" required step="100" type="number"/>
+                            <span class="error-message" id="health-insurance-error"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section class="net-pay">
+            <h2><i class="fas fa-calculator"></i> Net Pay</h2>
+            <div class="net-pay-container">
+                <div class="net-pay-item">
+                    <strong>Total Earnings</strong>
+                    <span id="total-earnings">₹0.00</span>
+                </div>
+                <div class="net-pay-item">
+                    <strong>Total Deductions</strong>
+                    <span id="total-deductions">₹0.00</span>
+                </div>
+                <div class="net-pay-item">
+                    <strong>Net Pay</strong>
+                    <span id="net-pay">₹0.00</span>
+                </div>
+            </div>
+        </section>
+        <div class="success-message" id="success-message">
+            <i class="fas fa-check-circle"></i> Payslip submitted successfully!
+        </div>
+        <div class="button-container">
+            <button class="btn-view" type="button" onclick="viewPayslips()">
+                <i class="fas fa-eye"></i> View Payslips
+            </button>
+            <button class="btn-submit" type="submit">
+                <i class="fas fa-paper-plane"></i> Submit
+            </button>
+        </div>
+    </form>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Load jsPDF (assuming it's included via a CDN or local script)
+        const { jsPDF } = window.jspdf || {};
+
+        // Number to words conversion (for potential PDF generation)
+        function numberToWords(num) {
+            if (num === 0) return 'Zero Only';
+            if (num > 9999999) return 'Amount too large';
+
+            const ones = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+            function convertHundreds(n) {
+                let str = '';
+                if (n > 99) {
+                    str += ones[Math.floor(n / 100)] + ' Hundred';
+                    n %= 100;
+                    if (n > 0) str += ' and ';
+                }
+                if (n > 19) {
+                    str += tens[Math.floor(n / 10)];
+                    n %= 10;
+                    if (n > 0) str += ' ' + ones[n];
+                } else if (n > 9) {
+                    str += teens[n - 10];
+                } else if (n > 0) {
+                    str += ones[n];
+                }
+                return str;
+            }
+
+            let str = '';
+            let lakh = Math.floor(num / 100000);
+            num %= 100000;
+            let thousand = Math.floor(num / 1000);
+            num %= 1000;
+
+            if (lakh > 0) {
+                str += convertHundreds(lakh) + ' Lakh';
+                if (thousand > 0 || num > 0) str += ' ';
+            }
+            if (thousand > 0) {
+                str += convertHundreds(thousand) + ' Thousand';
+                if (num > 0) str += ' ';
+            }
+            if (num > 0) {
+                str += convertHundreds(num);
+            }
+
+            return str.trim() + ' Only';
+        }
+
+        // Toast notification function (from original page1)
+        function showToast(message, type) {
+            const toast = document.createElement("div");
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === "success" ? "fa-check-circle" : type === "error" ? "fa-times-circle" : "fa-exclamation-triangle"}"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // View payslips redirect (from original page1)
+        function viewPayslips() {
+            showToast("Redirecting to Payslip Viewer...", "success");
+            setTimeout(() => {
+                window.location.href = './Payslip_Viewer.html';
+            }, 500);
+        }
+
+        // Calculate totals (from original page1, unchanged)
+        function calculateTotals() {
+            const basicSalary = parseFloat(document.querySelector('[name="basic-salary"]').value) || 0;
+            const hra = parseFloat(document.querySelector('[name="hra"]').value) || 0;
+            const specialAllowance = parseFloat(document.querySelector('[name="special-allowance"]').value) || 0;
+            const bonus = parseFloat(document.querySelector('[name="bonus"]').value) || 0;
+            const incomeTaxDeduction = parseFloat(document.querySelector('[name="income-tax-deduction"]').value) || 0;
+            const pf = parseFloat(document.querySelector('[name="pf"]').value) || 0;
+            const healthInsurance = parseFloat(document.querySelector('[name="health-insurance"]').value) || 0;
+            const totalEarnings = basicSalary + hra + specialAllowance + bonus;
+            const totalDeductions = incomeTaxDeduction + pf + healthInsurance;
+            const netPay = totalEarnings - totalDeductions;
+            document.getElementById("total-earnings").textContent = `₹${totalEarnings.toFixed(2)}`;
+            document.getElementById("total-deductions").textContent = `₹${totalDeductions.toFixed(2)}`;
+            document.getElementById("net-pay").textContent = `₹${netPay.toFixed(2)}`;
+        }
+
+        // Format name input (from original page1, unchanged)
+        function formatNameInput(input) {
+            let value = input.value;
+            let caretPos = input.selectionStart;
+            value = value.replace(/[^a-zA-Z ]/g, "").toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+            if (value !== input.value) {
+                input.value = value;
+                input.setSelectionRange(caretPos, caretPos);
+            }
+            return value;
+        }
+
+        // Validation functions (adapted from provided script)
+        function validateEmployeeId(id) {
+            return /^ATS0[0-9]{3}$/.test(id) && id !== 'ATS0000';
+        }
+
+        function validateMonth(month) {
+            if (!month) return false;
+            const date = new Date(month + '-01');
+            const minDate = new Date('2005-01-01');
+            const maxDate = new Date('2025-05-01');
+            return date >= minDate && date <= maxDate;
+        }
+
+        function validatePAN(pan) {
+            return /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
+        }
+
+        function validateUAN(uan) {
+            return /^\d{12}$/.test(uan);
+        }
+
+        function validateDate(dateString) {
+            if (!dateString) return false;
+            const date = new Date(dateString);
+            const today = new Date();
+            const minDate = new Date('2021-01-01');
+            return !isNaN(date.getTime()) && date >= minDate && date <= today;
+        }
+
+        function validateBankName(bankName) {
+            return /^[a-zA-Z\s]+$/.test(bankName) && bankName.trim().length >= 2;
+        }
+
+        function validateAccountNumber(accountNo) {
+            return /^\d{10,18}$/.test(accountNo);
+        }
+
+        function validatePFNumber(pfNo) {
+            return /^[A-Z0-9]{12,22}$/.test(pfNo);
+        }
+
+        function validateESICNumber(esicNo) {
+            return /^[A-Z0-9]{10,17}$/.test(esicNo);
+        }
+
+        // Input event listeners for real-time validation
+        const employeeName = document.getElementById('employee-name');
+        employeeName.addEventListener('input', () => {
+            const value = formatNameInput(employeeName);
+            const isValid = /^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/.test(value) && value.length >= 2;
+            employeeName.classList.toggle('valid', isValid);
+            employeeName.classList.toggle('invalid', !isValid);
+            document.getElementById('name-error').textContent = isValid ? '' : 'Name must contain only letters and single spaces (min 2 chars)';
+        });
+
+        const employeeId = document.getElementById('employee-id');
+        employeeId.addEventListener('input', () => {
+            employeeId.value = employeeId.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (!employeeId.value.startsWith('ATS')) {
+                employeeId.value = 'ATS' + employeeId.value.replace(/ATS/g, '');
+            }
+            if (employeeId.value.length > 7) {
+                employeeId.value = employeeId.value.substring(0, 7);
+            }
+            const isValid = validateEmployeeId(employeeId.value);
+            employeeId.classList.toggle('valid', isValid);
+            employeeId.classList.toggle('invalid', !isValid);
+            document.getElementById('id-error').textContent = isValid ? '' : 'ID must be ATS0 followed by 3 digits (e.g., ATS0123)';
+        });
+
+        const department = document.getElementById('department');
+        department.addEventListener('change', () => {
+            const isValid = department.value !== '';
+            department.classList.toggle('valid', isValid);
+            department.classList.toggle('invalid', !isValid);
+            document.getElementById('department-error').textContent = isValid ? '' : 'Please select a department';
+        });
+
+        const employmentType = document.getElementById('employment-type');
+        employmentType.addEventListener('change', () => {
+            const isValid = employmentType.value !== '';
+            employmentType.classList.toggle('valid', isValid);
+            employmentType.classList.toggle('invalid', !isValid);
+            document.getElementById('employment-type-error').textContent = isValid ? '' : 'Please select an employment type';
+        });
+
+        const workingDays = document.getElementById('working-days');
+        workingDays.addEventListener('input', () => {
+            const value = parseInt(workingDays.value);
+            const isValid = !isNaN(value) && value >= 1 && value <= 31;
+            workingDays.classList.toggle('valid', isValid);
+            workingDays.classList.toggle('invalid', !isValid);
+            document.getElementById('working-days-error').textContent = isValid ? '' : 'Working days must be between 1 and 31';
+        });
+
+        const dateOfJoining = document.getElementById('date-of-joining');
+        dateOfJoining.addEventListener('input', () => {
+            const isValid = validateDate(dateOfJoining.value);
+            dateOfJoining.classList.toggle('valid', isValid);
+            dateOfJoining.classList.toggle('invalid', !isValid);
+            document.getElementById('date-of-joining-error').textContent = isValid ? '' : 'Date of joining must be between Jan 2021 and today';
+        });
+
+        const payrollMonth = document.getElementById('payroll-month');
+        payrollMonth.addEventListener('input', () => {
+            const isValid = validateMonth(payrollMonth.value);
+            payrollMonth.classList.toggle('valid', isValid);
+            payrollMonth.classList.toggle('invalid', !isValid);
+            document.getElementById('payroll-month-error').textContent = isValid ? '' : 'Please select a valid month (Jan 2005 - May 2025)';
+        });
+
+        const bankName = document.getElementById('bank-name');
+        bankName.addEventListener('input', () => {
+            const isValid = validateBankName(bankName.value);
+            bankName.classList.toggle('valid', isValid);
+            bankName.classList.toggle('invalid', !isValid);
+            document.getElementById('bank-name-error').textContent = isValid ? '' : 'Bank name must contain only letters and spaces (min 2 chars)';
+        });
+
+        const accountNumber = document.getElementById('account-number');
+        accountNumber.addEventListener('input', () => {
+            const isValid = validateAccountNumber(accountNumber.value);
+            accountNumber.classList.toggle('valid', isValid);
+            accountNumber.classList.toggle('invalid', !isValid);
+            document.getElementById('account-number-error').textContent = isValid ? '' : 'Account number must be 10-18 digits';
+        });
+
+        const uanNumber = document.getElementById('uan-number');
+        uanNumber.addEventListener('input', () => {
+            const isValid = validateUAN(uanNumber.value);
+            uanNumber.classList.toggle('valid', isValid);
+            uanNumber.classList.toggle('invalid', !isValid);
+            document.getElementById('uan-number-error').textContent = isValid ? '' : 'UAN must be a 12-digit number';
+        });
+
+        const panNumber = document.getElementById('pan-number');
+        panNumber.addEventListener('input', () => {
+            panNumber.value = panNumber.value.toUpperCase();
+            const isValid = validatePAN(panNumber.value);
+            panNumber.classList.toggle('valid', isValid);
+            panNumber.classList.toggle('invalid', !isValid);
+            document.getElementById('pan-number-error').textContent = isValid ? '' : 'PAN must be 5 letters, 4 digits, 1 letter (e.g., ABCDE1234F)';
+        });
+
+        const pfNumber = document.getElementById('pf-number');
+        pfNumber.addEventListener('input', () => {
+            const isValid = validatePFNumber(pfNumber.value);
+            pfNumber.classList.toggle('valid', isValid);
+            pfNumber.classList.toggle('invalid', !isValid);
+            document.getElementById('pf-number-error').textContent = isValid ? '' : 'PF number must be 12-22 alphanumeric characters';
+        });
+
+        const esicNumber = document.getElementById('esic-number');
+        esicNumber.addEventListener('input', () => {
+            const isValid = validateESICNumber(esicNumber.value);
+            esicNumber.classList.toggle('valid', isValid);
+            esicNumber.classList.toggle('invalid', !isValid);
+            document.getElementById('esic-number-error').textContent = isValid ? '' : 'ESIC number must be 10-17 alphanumeric characters';
+        });
+
+        // Numeric inputs validation
+        const numberInputs = document.querySelectorAll('input[type="number"]');
+        numberInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                input.value = input.value.replace(/[^0-9.]/g, '');
+                const value = parseFloat(input.value) || 0;
+                const isValid = input.name === 'basic-salary' ? value > 0 : value >= 0;
+                input.classList.toggle('valid', isValid);
+                input.classList.toggle('invalid', !isValid);
+                document.getElementById(`${input.name}-error`).textContent = isValid ? '' : input.name === 'basic-salary' ? 'Basic salary must be positive' : `${input.name.replace(/-/g, ' ')} must be non-negative`;
+                if (input.value && input.value.includes('.') && (input.value.split('.')[1] || '').length > 2) {
+                    input.value = parseFloat(input.value).toFixed(2);
+                }
+                calculateTotals();
+            });
+        });
+
+        // Form submission
+        async function validateForm(event) {
+            event.preventDefault();
+            let isValid = true;
+            const errors = [];
+
+            // Employee Name
+            const employeeNameValue = formatNameInput(employeeName);
+            if (!/^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/.test(employeeNameValue) || employeeNameValue.length < 2) {
+                employeeName.classList.add('invalid');
+                employeeName.classList.remove('valid');
+                document.getElementById('name-error').textContent = 'Name must contain only letters and single spaces (min 2 chars)';
+                errors.push('Invalid name');
+                isValid = false;
+            }
+
+            // Employee ID
+            const employeeIdValue = employeeId.value.trim().toUpperCase();
+            if (!validateEmployeeId(employeeIdValue)) {
+                employeeId.classList.add('invalid');
+                employeeId.classList.remove('valid');
+                document.getElementById('id-error').textContent = 'ID must be ATS0 followed by 3 digits (e.g., ATS0123)';
+                errors.push('Invalid Employee ID');
+                isValid = false;
+            }
+
+            // Department
+            const departmentValue = department.value;
+            if (!departmentValue) {
+                department.classList.add('invalid');
+                department.classList.remove('valid');
+                document.getElementById('department-error').textContent = 'Please select a department';
+                errors.push('Department not selected');
+                isValid = false;
+            }
+
+            // Employment Type
+            const employmentTypeValue = employmentType.value;
+            if (!employmentTypeValue) {
+                employmentType.classList.add('invalid');
+                employmentType.classList.remove('valid');
+                document.getElementById('employment-type-error').textContent = 'Please select an employment type';
+                errors.push('Employment type not selected');
+                isValid = false;
+            }
+
+            // Working Days
+            const workingDaysValue = parseInt(workingDays.value);
+            if (isNaN(workingDaysValue) || workingDaysValue < 1 || workingDaysValue > 31) {
+                workingDays.classList.add('invalid');
+                workingDays.classList.remove('valid');
+                document.getElementById('working-days-error').textContent = 'Working days must be between 1 and 31';
+                errors.push('Invalid working days');
+                isValid = false;
+            }
+
+            // Date of Joining
+            const dateOfJoiningValue = dateOfJoining.value;
+            if (!validateDate(dateOfJoiningValue)) {
+                dateOfJoining.classList.add('invalid');
+                dateOfJoining.classList.remove('valid');
+                document.getElementById('date-of-joining-error').textContent = 'Date of joining must be between Jan 2021 and today';
+                errors.push('Invalid date of joining');
+                isValid = false;
+            }
+
+            // Payroll Month
+            const payrollMonthValue = payrollMonth.value;
+            if (!validateMonth(payrollMonthValue)) {
+                payrollMonth.classList.add('invalid');
+                payrollMonth.classList.remove('valid');
+                document.getElementById('payroll-month-error').textContent = 'Please select a valid month (Jan 2005 - May 2025)';
+                errors.push('Invalid payroll month');
+                isValid = false;
+            }
+
+            // Bank Name
+            const bankNameValue = bankName.value.trim();
+            if (!validateBankName(bankNameValue)) {
+                bankName.classList.add('invalid');
+                bankName.classList.remove('valid');
+                document.getElementById('bank-name-error').textContent = 'Bank name must contain only letters and spaces (min 2 chars)';
+                errors.push('Invalid bank name');
+                isValid = false;
+            }
+
+            // Account Number
+            const accountNumberValue = accountNumber.value.trim();
+            if (!validateAccountNumber(accountNumberValue)) {
+                accountNumber.classList.add('invalid');
+                accountNumber.classList.remove('valid');
+                document.getElementById('account-number-error').textContent = 'Account number must be 10-18 digits';
+                errors.push('Invalid bank account number');
+                isValid = false;
+            }
+
+            // UAN Number
+            const uanNumberValue = uanNumber.value.trim();
+            if (!validateUAN(uanNumberValue)) {
+                uanNumber.classList.add('invalid');
+                uanNumber.classList.remove('valid');
+                document.getElementById('uan-number-error').textContent = 'UAN must be a 12-digit number';
+                errors.push('Invalid UAN number');
+                isValid = false;
+            }
+
+            // PAN Number
+            const panNumberValue = panNumber.value.trim().toUpperCase();
+            if (!validatePAN(panNumberValue)) {
+                panNumber.classList.add('invalid');
+                panNumber.classList.remove('valid');
+                document.getElementById('pan-number-error').textContent = 'PAN must be 5 letters, 4 digits, 1 letter (e.g., ABCDE1234F)';
+                errors.push('Invalid PAN number');
+                isValid = false;
+            }
+
+            // PF Number
+            const pfNumberValue = pfNumber.value.trim();
+            if (!validatePFNumber(pfNumberValue)) {
+                pfNumber.classList.add('invalid');
+                pfNumber.classList.remove('valid');
+                document.getElementById('pf-number-error').textContent = 'PF number must be 12-22 alphanumeric characters';
+                errors.push('Invalid PF number');
+                isValid = false;
+            }
+
+            // ESIC Number
+            const esicNumberValue = esicNumber.value.trim();
+            if (!validateESICNumber(esicNumberValue)) {
+                esicNumber.classList.add('invalid');
+                esicNumber.classList.remove('valid');
+                document.getElementById('esic-number-error').textContent = 'ESIC number must be 10-17 alphanumeric characters';
+                errors.push('Invalid ESIC number');
+                isValid = false;
+            }
+
+            // Numeric fields
+            const numericFields = ['basic-salary', 'hra', 'special-allowance', 'bonus', 'income-tax-deduction', 'pf', 'health-insurance'];
+            numericFields.forEach(id => {
+                const input = document.querySelector(`[name="${id}"]`);
+                const value = parseFloat(input.value) || 0;
+                const isValid = id === 'basic-salary' ? value > 0 : value >= 0;
+                if (!isValid) {
+                    input.classList.add('invalid');
+                    input.classList.remove('valid');
+                    document.getElementById(`${id}-error`).textContent = id === 'basic-salary' ? 'Basic salary must be positive' : `${id.replace(/-/g, ' ')} must be non-negative`;
+                    errors.push(`Invalid ${id.replace(/-/g, ' ')}`);
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                const submitBtn = document.querySelector('.btn-submit');
+                const originalHtml = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
+                submitBtn.disabled = true;
+
+                try {
+                    const timestamp = `${payrollMonthValue}-01T00:00:00.000Z`;
+
+                    const payslipData = {
+                        employeeName: employeeNameValue,
+                        employeeId: employeeIdValue,
+                        department: departmentValue,
+                        employmentType: employmentTypeValue,
+                        workingDays: workingDaysValue,
+                        dateOfJoining: dateOfJoiningValue,
+                        bankDetails: {
+                            bankName: bankNameValue,
+                            accountNumber: accountNumberValue
+                        },
+                        governmentIds: {
+                            uanNumber: uanNumberValue,
+                            panNumber: panNumberValue,
+                            pfNumber: pfNumberValue,
+                            esicNumber: esicNumberValue
+                        },
+                        earnings: {
+                            basicSalary: parseFloat(document.querySelector('[name="basic-salary"]').value) || 0,
+                            hra: parseFloat(document.querySelector('[name="hra"]').value) || 0,
+                            specialAllowance: parseFloat(document.querySelector('[name="special-allowance"]').value) || 0,
+                            bonus: parseFloat(document.querySelector('[name="bonus"]').value) || 0
+                        },
+                        deductions: {
+                            incomeTaxDeduction: parseFloat(document.querySelector('[name="income-tax-deduction"]').value) || 0,
+                            pf: parseFloat(document.querySelector('[name="pf"]').value) || 0,
+                            healthInsurance: parseFloat(document.querySelector('[name="health-insurance"]').value) || 0
+                        },
+                        totals: {
+                            totalEarnings: parseFloat(document.getElementById('total-earnings').textContent.replace('₹', '')),
+                            totalDeductions: parseFloat(document.getElementById('total-deductions').textContent.replace('₹', '')),
+                            netPay: parseFloat(document.getElementById('net-pay').textContent.replace('₹', ''))
+                        },
+                        timestamp: timestamp
+                    };
+
+                    await savePayslip(payslipData);
+                    submitBtn.innerHTML = originalHtml;
+                    submitBtn.disabled = false;
+
+                    document.getElementById('payslip-form').reset();
+                    document.getElementById('total-earnings').textContent = '₹0.00';
+                    document.getElementById('total-deductions').textContent = '₹0.00';
+                    document.getElementById('net-pay').textContent = '₹0.00';
+                    document.querySelectorAll('input, select').forEach(input => {
+                        input.classList.remove('valid', 'invalid');
+                        const errorElement = document.getElementById(`${input.id}-error`);
+                        if (errorElement) errorElement.textContent = '';
+                    });
+
+                    // Show success message
+                    const successMessage = document.getElementById('success-message');
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 5000);
+
+                    showToast('Payslip submitted successfully!', 'success');
+                } catch (err) {
+                    submitBtn.innerHTML = originalHtml;
+                    submitBtn.disabled = false;
+                    showToast(err.message || 'Error submitting payslip', 'error');
+                }
+            } else {
+                showToast(`Please correct: ${errors.join(', ')}`, 'error');
+            }
+        }
+
+        // Save payslip (from original page1, unchanged)
+        async function savePayslip(payslipData) {
+            try {
+                const response = await fetch('http://43.204.144.109:3012/api/payslips', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payslipData)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to save payslip');
+                }
+                return await response.json();
+            } catch (err) {
+                console.error('Error saving payslip:', err);
+                throw err;
+            }
+        }
+
+        // Attach form submission handler
+        document.getElementById('payslip-form').addEventListener('submit', validateForm);
+
+        // Set max date for date of joining to today and min to Jan 1, 2021
+        const today = new Date();
+        dateOfJoining.max = today.toISOString().split('T')[0];
+        dateOfJoining.min = '2021-01-01';
+
+        // Set default payroll month to current month
+        payrollMonth.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    });
+</script>
+</body>
+</html>
